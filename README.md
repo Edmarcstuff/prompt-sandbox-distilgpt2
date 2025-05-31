@@ -1,17 +1,30 @@
-# Prompt Sandbox using DistilGPT-2
+!pip install transformers
 
-Hey everybody, this is a simple AI prompt engineering playground built with Python and Hugging Face Transformers. It uses the lightweight `distilgpt2` model to generate text completions from any user prompt.
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
-## What It Does
+# Load pretrained tokenizer and model (from HuggingFace)
+model_name = "distilgpt2"
+tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+model = GPT2LMHeadModel.from_pretrained(model_name)
 
-- Loads `distilgpt2` from Hugging Face
-- Generates open-ended text completions based on your custom prompt
-- Allows temperature and length customization
-- Ideal for testing prompt effectiveness and exploring text generation
+# Defines the text generation
+def generate_text(prompt, max_length=50, temperature=1.0):
+    inputs = tokenizer(prompt, return_tensors="pt")
+    outputs = model.generate(
+        **inputs,
+        max_length=max_length,
+        temperature=temperature,
+        num_return_sequences=1,
+        do_sample=True,
+        top_k=50,
+        top_p=0.95)
+    
+    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+    
+# Prompt to train AI model to search for stuff
+prompt = "Write a brief paragraph about the future of Artificial Intelligence"
+generated = generate_text(prompt)
+print(generated)
 
-## Getting Started
-
-Run this notebook in Google Colab or locally with:
-
-```bash
-pip install transformers
+# Final prompt to define response
+generated = generate_text(prompt, max_length=100, temperature=1.2)
